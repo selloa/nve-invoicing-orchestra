@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>China Tour Invoice Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 35px;
+        }
+
+        .form-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            font-size: 1.3em;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        label .required {
+            color: #e74c3c;
+        }
+
+        input, select {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .production-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .production-option {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .production-option input[type="radio"] {
+            display: none;
+        }
+
+        .production-option label {
+            display: block;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .production-option input[type="radio"]:checked + label {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .production-option label:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            padding: 5px 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        #invoicePreview {
+            display: none;
+            margin-top: 40px;
+            border-top: 3px solid #667eea;
+            padding-top: 40px;
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .print-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .print-btn:hover {
+            background: #229954;
+        }
+
+        .edit-btn {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #7f8c8d;
+        }
+
+        .invoice-container {
+            background: white;
+            padding: 40px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+
+        /* Invoice Styles */
+        .invoice-header {
+            border-bottom: 3px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .invoice-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .invoice-info-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .bill-to, .bill-from {
+            width: 45%;
+        }
+
+        .bill-to h3, .bill-from h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .invoice-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .item-row {
+            background-color: #fff;
+        }
+
+        .subtotal-row {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+
+        .total-row {
+            background-color: #333;
+            color: #fff;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .payment-info-box {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f0f0f0;
+        }
+
+        .notes-box {
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #333;
+        }
+
+        .invoice-footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .readme-section {
+            margin-top: 60px;
+            padding: 40px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid #667eea;
+        }
+
+        .readme-section h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .readme-section h2 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .readme-section h3 {
+            color: #764ba2;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .readme-section h4 {
+            color: #555;
+            font-size: 1em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .readme-section p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .readme-section ul, .readme-section ol {
+            margin-bottom: 15px;
+            padding-left: 20px;
+        }
+
+        .readme-section li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+            color: #444;
+        }
+
+        .readme-section table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        .readme-section table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .readme-section table td {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+        }
+
+        .readme-section table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .readme-section code {
+            background: #e8e8e8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .readme-section strong {
+            color: #333;
+        }
+
+        .readme-section hr {
+            border: none;
+            border-top: 2px solid #e0e0e0;
+            margin: 30px 0;
+        }
+
+        .readme-tip {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .readme-important {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .form-container {
+                display: none;
+            }
+            .preview-actions {
+                display: none;
+            }
+            #invoicePreview {
+                border-top: none;
+                padding-top: 0;
+            }
+            .readme-section {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .invoice-info-grid {
+                flex-direction: column;
+            }
+            .bill-to, .bill-from {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 China Tour Invoice Generator</h1>
+            <p>Generate professional invoices for Mozart & Elisabeth tour</p>
+        </div>
+
+        <div class="form-container">
+            <form id="invoiceForm">
+                <!-- Personal Information -->
+                <div class="form-section">
+                    <h2>👤 Personal Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Full Name <span class="required">*</span></label>
+                            <input type="text" id="fullName" required placeholder="e.g., Max Mustermann">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Street Address <span class="required">*</span></label>
+                            <input type="text" id="street" required placeholder="e.g., Hauptstraße 123">
+                        </div>
+                        <div class="form-group">
+                            <label>Postal Code <span class="required">*</span></label>
+                            <input type="text" id="postalCode" required placeholder="e.g., 10115">
+                        </div>
+                        <div class="form-group">
+                            <label>City <span class="required">*</span></label>
+                            <input type="text" id="city" required placeholder="e.g., Berlin">
+                        </div>
+                        <div class="form-group">
+                            <label>Country <span class="required">*</span></label>
+                            <input type="text" id="country" required placeholder="e.g., Germany">
+                        </div>
+                        <div class="form-group">
+                            <label>Email <span class="required">*</span></label>
+                            <input type="email" id="email" required placeholder="your.email@example.com">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Tax Number <span class="required">*</span></label>
+                            <input type="text" id="taxNumber" required placeholder="e.g., 12345678901">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bank Information -->
+                <div class="form-section">
+                    <h2>🏦 Bank Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Bank Name <span class="required">*</span></label>
+                            <input type="text" id="bankName" required placeholder="e.g., Deutsche Bank Berlin">
+                        </div>
+                        <div class="form-group">
+                            <label>IBAN <span class="required">*</span></label>
+                            <input type="text" id="iban" required placeholder="e.g., DE89 3704 0044 0532 0130 00">
+                        </div>
+                        <div class="form-group">
+                            <label>BIC <span class="required">*</span></label>
+                            <input type="text" id="bic" required placeholder="e.g., COBADEFFXXX">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contract Information -->
+                <div class="form-section">
+                    <h2>📋 Contract Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Production Type <span class="required">*</span></label>
+                            <div class="production-options">
+                                <div class="production-option">
+                                    <input type="radio" id="both" name="production" value="both" checked>
+                                    <label for="both">Both Productions<br>(Mozart + Elisabeth)</label>
+                                </div>
+                                <div class="production-option">
+                                    <input type="radio" id="mozart" name="production" value="mozart">
+                                    <label for="mozart">Mozart Only</label>
+                                </div>
+                                <div class="production-option">
+                                    <input type="radio" id="elisabeth" name="production" value="elisabeth">
+                                    <label for="elisabeth">Elisabeth Only</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Total Contract Amount (EUR) <span class="required">*</span></label>
+                            <input type="number" id="totalAmount" required placeholder="e.g., 15000" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Invoice Month <span class="required">*</span></label>
+                            <select id="invoiceMonth" required>
+                                <option value="">Select month...</option>
+                                <option value="november">November 2025</option>
+                                <option value="december">December 2025</option>
+                                <option value="january">January 2026</option>
+                                <option value="february">February 2026</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <h3>📊 Payment Schedules by Production Type:</h3>
+                        <p style="margin-bottom: 10px;"><strong>Both Productions (Mozart + Elisabeth):</strong></p>
+                        <ul style="margin-bottom: 15px;">
+                            <li>• November: 20% + €1,680 per diems</li>
+                            <li>• December: 35% + €1,240 per diems</li>
+                            <li>• January: 35% + €320 per diems</li>
+                            <li>• February: 10% (no per diems)</li>
+                        </ul>
+                        <p style="margin-bottom: 10px;"><strong>Mozart Only:</strong></p>
+                        <ul style="margin-bottom: 15px;">
+                            <li>• November: 30% + €1,680 per diems</li>
+                            <li>• December: 50% + €120 per diems</li>
+                            <li>• January: 20% (no per diems)</li>
+                            <li>• February: 0% (Mozart tour ends in January)</li>
+                        </ul>
+                        <p style="margin-bottom: 10px;"><strong>Elisabeth Only:</strong></p>
+                        <ul>
+                            <li>• November: 0% (no invoice - tour starts in January)</li>
+                            <li>• December: 0% fee + €1,120 per diems</li>
+                            <li>• January: 60% + €320 per diems</li>
+                            <li>• February: 40% (no per diems)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Invoice Details -->
+                <div class="form-section">
+                    <h2>🧾 Invoice Details</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Invoice Number <span class="required">*</span></label>
+                            <input type="text" id="invoiceNumber" required placeholder="e.g., 2025-09">
+                        </div>
+                        <div class="form-group">
+                            <label>Invoice Date <span class="required">*</span></label>
+                            <input type="date" id="invoiceDate" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="generate-btn">✨ Generate Invoice</button>
+            </form>
+
+            <!-- Preview Section -->
+            <div id="invoicePreview">
+                <div class="preview-actions">
+                    <button type="button" class="action-btn print-btn" onclick="printInvoice()">🖨️ Save as PDF / Print</button>
+                    <button type="button" class="action-btn edit-btn" onclick="editInvoice()">✏️ Edit Information</button>
+                </div>
+                <div class="invoice-container" id="invoiceContent">
+                    <!-- Invoice will be generated here -->
+                </div>
+            </div>
+
+            <!-- README Section - Always Visible -->
+            <div class="readme-section">
+                    <h1>🎵 China Tour Invoice Generator - User Guide</h1>
+
+                    <h2>What is this?</h2>
+                    <p>A simple web-based tool that generates professional invoices for the China Tour (Mozart & Elisabeth productions). No installation needed, works offline, completely free!</p>
+
+                    <h2>How to Use</h2>
+
+                    <h3>Step 1: Open the File</h3>
+                    <ol>
+                        <li>Find the file <code>china-tour-invoice-generator.html</code></li>
+                        <li>Double-click it to open in your web browser (Chrome, Firefox, Safari, Edge - any will work!)</li>
+                        <li>That's it! No internet connection needed.</li>
+                    </ol>
+
+                    <h3>Step 2: Fill in Your Information</h3>
+                    <p>The form has 4 sections:</p>
+
+                    <h4>👤 Personal Information</h4>
+                    <ul>
+                        <li>Your full name</li>
+                        <li>Your address (street, postal code, city, country)</li>
+                        <li>Your email</li>
+                        <li>Your tax number</li>
+                    </ul>
+
+                    <h4>🏦 Bank Information</h4>
+                    <ul>
+                        <li>Bank name</li>
+                        <li>IBAN</li>
+                        <li>BIC</li>
+                    </ul>
+
+                    <h4>📋 Contract Information</h4>
+                    <ul>
+                        <li><strong>Production Type</strong>: Choose one of:
+                            <ul>
+                                <li>Both Productions (Mozart + Elisabeth)</li>
+                                <li>Mozart Only</li>
+                                <li>Elisabeth Only</li>
+                            </ul>
+                        </li>
+                        <li><strong>Total Contract Amount</strong>: The total amount in your contract (e.g., 15000)</li>
+                        <li><strong>Invoice Month</strong>: Which month you're invoicing for (November, December, January, or February)</li>
+                    </ul>
+
+                    <h4>🧾 Invoice Details</h4>
+                    <ul>
+                        <li><strong>Invoice Number</strong>: Your sequential invoice number (e.g., 2025-09)</li>
+                        <li><strong>Invoice Date</strong>: The date appears automatically (today), but you can change it</li>
+                    </ul>
+
+                    <h3>Step 3: Generate Invoice</h3>
+                    <p>Click the big purple "Generate Invoice" button at the bottom!</p>
+
+                    <h3>Step 4: Save as PDF</h3>
+                    <ol>
+                        <li>The invoice will appear below the form</li>
+                        <li>Click the green "Save as PDF / Print" button</li>
+                        <li>In the print dialog:
+                            <ul>
+                                <li>Select "Save as PDF" as your printer/destination</li>
+                                <li>Click Save</li>
+                            </ul>
+                        </li>
+                        <li>Done! Send this PDF to invoice@nordicview.dk (CC: liveirin@nordicview.dk)</li>
+                    </ol>
+
+                    <h2>Payment Schedules (Automatic)</h2>
+                    <p>The generator automatically calculates based on <strong>your production type</strong> and the month. The payment percentages differ by production!</p>
+
+                    <h3>Both Productions (Mozart + Elisabeth)</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Fee %</th>
+                                <th>Per Diems</th>
+                                <th>Example (€15,000 contract)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>November</td>
+                                <td>20%</td>
+                                <td>€1,680</td>
+                                <td>€3,000 + €1,680 = <strong>€4,680</strong></td>
+                            </tr>
+                            <tr>
+                                <td>December</td>
+                                <td>35%</td>
+                                <td>€1,240</td>
+                                <td>€5,250 + €1,240 = <strong>€6,490</strong></td>
+                            </tr>
+                            <tr>
+                                <td>January</td>
+                                <td>35%</td>
+                                <td>€320</td>
+                                <td>€5,250 + €320 = <strong>€5,570</strong></td>
+                            </tr>
+                            <tr>
+                                <td>February</td>
+                                <td>10%</td>
+                                <td>€0</td>
+                                <td>€1,500 + €0 = <strong>€1,500</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Mozart Only</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Fee %</th>
+                                <th>Per Diems</th>
+                                <th>Example (€8,000 contract)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>November</td>
+                                <td>30%</td>
+                                <td>€1,680</td>
+                                <td>€2,400 + €1,680 = <strong>€4,080</strong></td>
+                            </tr>
+                            <tr>
+                                <td>December</td>
+                                <td>50%</td>
+                                <td>€120</td>
+                                <td>€4,000 + €120 = <strong>€4,120</strong></td>
+                            </tr>
+                            <tr>
+                                <td>January</td>
+                                <td>20%</td>
+                                <td>€0</td>
+                                <td>€1,600 + €0 = <strong>€1,600</strong></td>
+                            </tr>
+                            <tr>
+                                <td>February</td>
+                                <td>0%</td>
+                                <td>€0</td>
+                                <td>No invoice (tour ends)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Elisabeth Only</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Fee %</th>
+                                <th>Per Diems</th>
+                                <th>Example (€7,000 contract)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>November</td>
+                                <td>0%</td>
+                                <td>€0</td>
+                                <td>No invoice (tour starts Jan)</td>
+                            </tr>
+                            <tr>
+                                <td>December</td>
+                                <td>0%</td>
+                                <td>€1,120</td>
+                                <td>€0 + €1,120 = <strong>€1,120</strong></td>
+                            </tr>
+                            <tr>
+                                <td>January</td>
+                                <td>60%</td>
+                                <td>€320</td>
+                                <td>€4,200 + €320 = <strong>€4,520</strong></td>
+                            </tr>
+                            <tr>
+                                <td>February</td>
+                                <td>40%</td>
+                                <td>€0</td>
+                                <td>€2,800 + €0 = <strong>€2,800</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="readme-important">
+                        <strong>⚠️ Important:</strong> The generator will warn you if you try to create an invoice for an invalid month/production combination!
+                    </div>
+
+                    <h2>Tips</h2>
+                    <div class="readme-tip">
+                        <p><strong>✅ Save your information:</strong> After filling the form once, you can bookmark the generated invoice or save the HTML file with a new name</p>
+                    </div>
+                    <div class="readme-tip">
+                        <p><strong>✅ Reuse the tool:</strong> Just edit the invoice month and number for your next invoice</p>
+                    </div>
+                    <div class="readme-tip">
+                        <p><strong>✅ Share with colleagues:</strong> Send them the <code>china-tour-invoice-generator.html</code> file - it works on any device with a browser!</p>
+                    </div>
+                    <div class="readme-tip">
+                        <p><strong>✅ Works offline:</strong> No internet needed. Perfect for when you're in China!</p>
+                    </div>
+                    <div class="readme-tip">
+                        <p><strong>✅ Mobile friendly:</strong> Works on phones and tablets too</p>
+                    </div>
+
+                    <h2>Troubleshooting</h2>
+
+                    <h4>Q: The file won't open</h4>
+                    <ul>
+                        <li>Make sure it ends with <code>.html</code></li>
+                        <li>Try right-clicking and selecting "Open with" → choose your browser</li>
+                    </ul>
+
+                    <h4>Q: Can I use this on my phone?</h4>
+                    <ul>
+                        <li>Yes! Just open the HTML file in your mobile browser</li>
+                    </ul>
+
+                    <h4>Q: The PDF looks wrong when I print</h4>
+                    <ul>
+                        <li>Make sure your browser zoom is at 100%</li>
+                        <li>Try a different browser if issues persist</li>
+                    </ul>
+
+                    <h4>Q: Can I edit an invoice after generating?</h4>
+                    <ul>
+                        <li>Yes! Click the "Edit Information" button to go back to the form</li>
+                    </ul>
+
+                    <h2>Company Information (Pre-filled)</h2>
+                    <p>The invoice is automatically addressed to:</p>
+                    <ul>
+                        <li><strong>Nordic View Entertainment ApS</strong></li>
+                        <li>CVR/UID: DK45383172</li>
+                        <li>Takshaven 7, DK-3450 Allerød, Denmark</li>
+                    </ul>
+
+                    <p>Invoice should be sent to:</p>
+                    <ul>
+                        <li><strong>Primary:</strong> invoice@nordicview.dk</li>
+                        <li><strong>CC:</strong> liveirin@nordicview.dk</li>
+                    </ul>
+
+                    <hr>
+
+                    <p style="text-align: center; color: #666;">
+                        <strong>Created:</strong> November 2025<br>
+                        <strong>For:</strong> China Tour Orchestra Members<br>
+                        <strong>Questions?</strong> Ask Ruben or anyone who's already used it successfully!
+                    </p>
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date as default
+        document.getElementById('invoiceDate').valueAsDate = new Date();
+
+        // Form submission handler
+        document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            generateInvoice();
+        });
+
+        function generateInvoice() {
+            // Get form values
+            const fullName = document.getElementById('fullName').value;
+            const street = document.getElementById('street').value;
+            const postalCode = document.getElementById('postalCode').value;
+            const city = document.getElementById('city').value;
+            const country = document.getElementById('country').value;
+            const email = document.getElementById('email').value;
+            const taxNumber = document.getElementById('taxNumber').value;
+            const bankName = document.getElementById('bankName').value;
+            const iban = document.getElementById('iban').value;
+            const bic = document.getElementById('bic').value;
+            const production = document.querySelector('input[name="production"]:checked').value;
+            const totalAmount = parseFloat(document.getElementById('totalAmount').value);
+            const invoiceMonth = document.getElementById('invoiceMonth').value;
+            const invoiceNumber = document.getElementById('invoiceNumber').value;
+            const invoiceDate = new Date(document.getElementById('invoiceDate').value);
+
+            // Validate invoice month selection
+            if (!invoiceMonth) {
+                alert('Please select an invoice month.');
+                return;
+            }
+
+            // Calculate payment percentages and per diems based on production type
+            const paymentSchedules = {
+                both: {
+                    november: 0.20,
+                    december: 0.35,
+                    january: 0.35,
+                    february: 0.10
+                },
+                mozart: {
+                    november: 0.30,
+                    december: 0.50,
+                    january: 0.20,
+                    february: 0.00
+                },
+                elisabeth: {
+                    november: 0.00,
+                    december: 0.00,
+                    january: 0.60,
+                    february: 0.40
+                }
+            };
+
+            const perDiemSchedules = {
+                both: {
+                    november: 1680.00,
+                    december: 1240.00,
+                    january: 320.00,
+                    february: 0.00
+                },
+                mozart: {
+                    november: 1680.00,
+                    december: 120.00,
+                    january: 0.00,
+                    february: 0.00
+                },
+                elisabeth: {
+                    november: 0.00,
+                    december: 1120.00,
+                    january: 320.00,
+                    february: 0.00
+                }
+            };
+
+            const monthDetails = {
+                november: { longDate: 'November 25, 2025', shortDate: 'November 2025', note: 'Per diems for December 2025 are included in the November per diems amount, as per company instructions.' },
+                december: { longDate: 'December 1, 2025', shortDate: 'December 2025', note: '' },
+                january: { longDate: 'January 1, 2026', shortDate: 'January 2026', note: '' },
+                february: { longDate: 'February 1, 2026', shortDate: 'February 2026', note: '' }
+            };
+
+            const feePercentage = paymentSchedules[production][invoiceMonth];
+            const perDiem = perDiemSchedules[production][invoiceMonth];
+            const details = monthDetails[invoiceMonth];
+
+            // Warn about completely invalid invoice months (both fee and per diem are 0)
+            if (feePercentage === 0 && perDiem === 0) {
+                const productionName = production === 'both' ? 'Both Productions' : production === 'mozart' ? 'Mozart Only' : 'Elisabeth Only';
+                const monthName = invoiceMonth.charAt(0).toUpperCase() + invoiceMonth.slice(1);
+                alert(`⚠️ Warning: ${productionName} has no payment (0% fee + €0 per diems) in ${monthName}.\n\nYou should not create an invoice for this month with this production type.`);
+                return;
+            }
+
+            const feePayment = totalAmount * feePercentage;
+            const subtotal = feePayment + perDiem;
+            const total = subtotal;
+
+            // Format date
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = invoiceDate.toLocaleDateString('en-US', options);
+            
+            // Calculate due date (10 days from invoice date)
+            const dueDate = new Date(invoiceDate);
+            dueDate.setDate(dueDate.getDate() + 10);
+            const formattedDueDate = dueDate.toLocaleDateString('en-US', options);
+
+            // Production text
+            const productionText = {
+                'both': 'Mozart! and Elisabeth (Both Productions contract)',
+                'mozart': 'Mozart! (Mozart Only contract)',
+                'elisabeth': 'Elisabeth (Elisabeth Only contract)'
+            };
+
+            // Month capitalization
+            const monthCapitalized = invoiceMonth.charAt(0).toUpperCase() + invoiceMonth.slice(1);
+
+            // Generate invoice HTML
+            let invoiceHTML = `
+                <div class="invoice-header">
+                    <div class="invoice-title">INVOICE</div>
+                    <div style="margin-top: 20px;">
+                        <strong>Invoice Number:</strong> ${invoiceNumber}<br>
+                        <strong>Invoice Date:</strong> ${formattedDate}<br>
+                        <strong>Due Date:</strong> ${formattedDueDate} (10 days from invoice date)
+                    </div>
+                </div>
+
+                <div class="invoice-info-grid">
+                    <div class="bill-to">
+                        <h3>Bill To:</h3>
+                        <strong>Nordic View Entertainment ApS</strong><br>
+                        CVR/UID: DK45383172<br>
+                        Takshaven 7<br>
+                        DK-3450 Allerød<br>
+                        Denmark
+                    </div>
+                    <div class="bill-from">
+                        <h3>Bill From:</h3>
+                        <strong>${fullName}</strong><br>
+                        ${street}<br>
+                        ${postalCode} ${city}<br>
+                        ${country}<br>
+                        Email: ${email}<br>
+                        Tax Number: ${taxNumber}
+                    </div>
+                </div>
+
+                <div style="margin: 30px 0;">
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th>Summary</th>
+                                <th>Amount (EUR)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="item-row">
+                                <td>Fee Payment - ${monthCapitalized} (${Math.round(feePercentage * 100)}% of full fee)</td>
+                                <td>${formatCurrency(feePayment)}</td>
+                            </tr>`;
+
+            if (perDiem > 0) {
+                const perDiemNote = invoiceMonth === 'november' ? '(includes December 2025 in advance)' :
+                                   invoiceMonth === 'december' ? '(in advance for January)' :
+                                   invoiceMonth === 'january' ? '(in advance for February)' : '';
+                invoiceHTML += `
+                            <tr class="item-row">
+                                <td>Per Diems - ${monthCapitalized} ${perDiemNote}</td>
+                                <td>${formatCurrency(perDiem)}</td>
+                            </tr>`;
+            }
+
+            invoiceHTML += `
+                            <tr class="subtotal-row">
+                                <td><strong>Subtotal</strong></td>
+                                <td><strong>${formatCurrency(subtotal)}</strong></td>
+                            </tr>
+                            <tr class="item-row">
+                                <td>VAT (0% - Reverse Charge)</td>
+                                <td>0.00</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>TOTAL DUE</strong></td>
+                                <td><strong>${formatCurrency(total)}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="payment-info-box">
+                    <h3>Payment Information</h3>
+                    <p><strong>Bank Details:</strong><br>
+                    Bank: ${bankName}<br>
+                    IBAN: ${iban}<br>
+                    BIC: ${bic}</p>
+                    <p><strong>Payment Terms:</strong> 10 days (Due Date: ${formattedDueDate})<br>
+                    <strong>Note:</strong> Processing time might be up to 20 days due to payment across borders.</p>
+                </div>
+
+                <div class="notes-box">
+                    <h3>Notes</h3>
+                    <ul>
+                        <li>VAT: Not applicable under this agreement (reverse charge mechanism applies across EU borders)</li>`;
+            
+            if (details.note) {
+                invoiceHTML += `<li>${details.note}</li>`;
+            }
+            
+            invoiceHTML += `
+                        <li>This invoice covers services for the China Tour productions: ${productionText[production]}</li>
+                        <li>Invoice schedule percentage applied: Orchestra – ${production === 'both' ? 'Both Productions' : production === 'mozart' ? 'Mozart Only' : 'Elisabeth Only'}: ${Math.round(feePercentage * 100)}% (${monthCapitalized})</li>
+                    </ul>
+                </div>
+
+                <div class="invoice-footer">
+                    <p>Invoice prepared by: ${fullName}<br>
+                    Date: ${formattedDate}</p>
+                    <p style="margin-top: 20px;">
+                    <strong>Next Steps:</strong><br>
+                    1. Save as PDF<br>
+                    2. Send to: invoice@nordicview.dk<br>
+                    3. CC: liveirin@nordicview.dk
+                    </p>
+                </div>
+            `;
+
+            // Display invoice
+            document.getElementById('invoiceContent').innerHTML = invoiceHTML;
+            document.getElementById('invoicePreview').style.display = 'block';
+            
+            // Scroll to preview
+            document.getElementById('invoicePreview').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function formatCurrency(amount) {
+            return amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function printInvoice() {
+            window.print();
+        }
+
+        function editInvoice() {
+            document.getElementById('invoicePreview').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
+
