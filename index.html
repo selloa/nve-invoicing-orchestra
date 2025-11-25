@@ -613,7 +613,7 @@
             <!-- Preview Section -->
             <div id="invoicePreview">
                 <div class="preview-actions">
-                    <button type="button" class="action-btn print-btn" onclick="printInvoice()">🖨️ Save as PDF / Print</button>
+                    <button type="button" class="action-btn print-btn" onclick="printInvoice()">📄 Open Invoice in New Tab</button>
                     <button type="button" class="action-btn edit-btn" onclick="editInvoice()">✏️ Edit Information</button>
                 </div>
                 <div class="invoice-container" id="invoiceContent">
@@ -1119,7 +1119,204 @@
         }
 
         function printInvoice() {
-            window.print();
+            // Open invoice in new window for better print preview
+            const invoiceContent = document.getElementById('invoiceContent').innerHTML;
+            const newWindow = window.open('', '_blank');
+            
+            newWindow.document.write(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - ${document.getElementById('invoiceNumber').value}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px;
+            background: white;
+        }
+        
+        .invoice-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+        }
+        
+        .invoice-header {
+            border-bottom: 3px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .invoice-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .invoice-info-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .bill-to, .bill-from {
+            width: 45%;
+        }
+        
+        .bill-to h3, .bill-from h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .invoice-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        .item-row {
+            background-color: #fff;
+        }
+        
+        .subtotal-row {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+        
+        .total-row {
+            background-color: #333;
+            color: #fff;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .payment-info-box {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f0f0f0;
+        }
+        
+        .payment-info-box h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        
+        .notes-box {
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #333;
+        }
+        
+        .notes-box h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        
+        .notes-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .notes-box li {
+            padding: 5px 0;
+            color: #333;
+        }
+        
+        .invoice-footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .print-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        .print-btn-top {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .print-btn-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        @media print {
+            body {
+                padding: 0;
+            }
+            .print-controls {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .invoice-info-grid {
+                flex-direction: column;
+            }
+            .bill-to, .bill-from {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            .print-controls {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-controls">
+        <button class="print-btn-top" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    </div>
+    
+    <div class="invoice-container">
+        ${invoiceContent}
+    </div>
+</body>
+</html>
+            `);
+            
+            newWindow.document.close();
         }
 
         function editInvoice() {
