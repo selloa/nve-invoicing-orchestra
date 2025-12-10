@@ -34,6 +34,16 @@ The form has 4 sections:
 - **Total Contract Amount**: The total amount in your contract (e.g., 15000)
 - **Invoice Month**: Which month you're invoicing for (November, December, January, or February)
 
+#### 📎 Miscellaneous Items (Optional)
+- **Add Extra Items**: Click "Add Miscellaneous Item" to add:
+  - Train tickets
+  - Special expenses
+  - Any other contract-specific items
+- For each item, enter a description and amount
+- You can add multiple items
+- Click the "Remove" button to delete an item
+- These items will be added to your invoice total
+
 #### 🧾 Invoice Details
 - **Invoice Number**: Your sequential invoice number (e.g., 2025-09)
 - **Invoice Date**: The date appears automatically (today), but you can change it
@@ -94,6 +104,8 @@ The generator automatically calculates based on **your production type** and the
 
 ✅ **Mobile friendly**: Works on phones and tablets too
 
+✅ **Miscellaneous items**: Need to invoice for train tickets or special expenses? Use the "Miscellaneous Items" section to add any extra items to your invoice!
+
 ## Troubleshooting
 
 **Q: The file won't open**
@@ -109,6 +121,11 @@ The generator automatically calculates based on **your production type** and the
 
 **Q: Can I edit an invoice after generating?**
 - Yes! Click the "Edit Information" button to go back to the form
+
+**Q: Can I add extra items like train tickets to my invoice?**
+- Yes! Use the "Miscellaneous Items" section to add any extra items
+- Enter a description (e.g., "Train ticket Berlin-Munich") and the amount
+- You can add as many items as needed
 
 ## Company Information (Pre-filled)
 
